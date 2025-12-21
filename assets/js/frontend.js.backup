@@ -1,0 +1,399 @@
+/**
+ * Parent Meetings Frontend JavaScript
+ * Author: Tobalt — https://tobalt.lt
+ */
+
+(function($) {
+    'use strict';
+
+    // Wait for both DOM and pmFrontend to be ready
+    var initializationAttempts = 0;
+    var maxAttempts = 50;
+
+    function waitForPmFrontend() {
+        if (typeof pmFrontend === 'undefined') {
+            initializationAttempts++;
+            if (initializationAttempts < maxAttempts) {
+                setTimeout(waitForPmFrontend, 100);
+            } else {
+                // Error handling for all forms on page
+                $('.pm-booking-form').each(function() {
+                    var pid = $(this).data('project-id') || 0;
+                    $('#pm-loading-' + pid).hide();
+                    $(this).html('<div style="padding: 20px; background: #f8d7da; border-left: 3px solid #dc3545; color: #721c24;">Klaida: Sistema nepasikrovė. Prašome perkrauti puslapį arba susisiekti su administratoriumi.</div>');
+                });
+            }
+            return;
+        }
+
+        // Initialize all booking forms on the page
+        $('.pm-booking-form').each(function() {
+            initSingleBookingForm($(this));
+        });
+    }
+
+    function initSingleBookingForm($formContainer) {
+        var projectId = $formContainer.data('project-id') || 0;
+        var selectedClass = null;
+        var selectedTeacher = null;
+        var selectedType = null;
+        var selectedSlot = null;
+        var allClasses = [];
+
+        // Helper function to get element within this form with project-specific ID
+        function getEl(baseId) {
+            return $('#' + baseId + '-' + projectId);
+        }
+
+        // Hide loading spinner
+        getEl('pm-loading').hide();
+
+        // Check if class selection step exists in this form
+        var hasClassSelection = $formContainer.find('.pm-step[data-step="1"]').length > 0;
+
+        if (hasClassSelection) {
+            // Load classes only if step 1 exists
+            loadClasses();
+        } else {
+            // No class selection - load teachers directly
+            goToStep(2);
+            loadTeachers(0); // 0 means no class filter
+        }
+
+        function loadClasses() {
+            var projectId = pmFrontend.project_id || 0;
+
+            $.ajax({
+                url: pmFrontend.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'pm_get_classes',
+                    project_id: projectId,
+                    nonce: pmFrontend.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        allClasses = response.data;
+                        renderClasses(allClasses);
+                    } else {
+                        $('#pm-class-list').html('<p class="pm-empty">Klasių nerasta</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#pm-class-list').html('<p class="pm-empty">Įvyko klaida. Bandykite perkrauti puslapį.</p>');
+                }
+            });
+        }
+
+        function renderClasses(classes) {
+            const list = $('#pm-class-list');
+            list.empty();
+
+            if (classes.length === 0) {
+                list.html('<p class="pm-empty">Klasių nerasta</p>');
+                return;
+            }
+
+            classes.forEach(function(cls) {
+                const item = $('<div class="pm-list-item">')
+                    .text(cls.name)
+                    .data('class', cls)
+                    .on('click', function() {
+                        selectClass(cls);
+                    });
+                list.append(item);
+            });
+        }
+
+        function selectClass(cls) {
+            selectedClass = cls;
+            $('#pm-selected-class').val(cls.id);
+
+            $('.pm-list-item').removeClass('pm-selected');
+            $('.pm-list-item').filter(function() {
+                return $(this).data('class').id === cls.id;
+            }).addClass('pm-selected');
+
+            goToStep(2);
+            loadTeachers(cls.id);
+        }
+
+        function loadTeachers(classId) {
+            showLoading();
+
+            var projectId = pmFrontend.project_id || 0;
+
+            $.ajax({
+                url: pmFrontend.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'pm_get_teachers',
+                    class_id: classId,
+                    project_id: projectId,
+                    nonce: pmFrontend.nonce
+                },
+                success: function(response) {
+                    hideLoading();
+
+                    if (response.success) {
+                        renderTeachers(response.data);
+                    } else {
+                        $('#pm-teacher-list').html('<p class="pm-empty">' + (response.data || 'Mokytojų nerasta') + '</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    showError('Įvyko klaida. Bandykite perkrauti puslapį.');
+                }
+            });
+        }
+
+        function renderTeachers(teachers) {
+            const list = $('#pm-teacher-list');
+            list.empty();
+
+            if (teachers.length === 0) {
+                list.html('<p class="pm-empty">Šiai klasei mokytojų nėra arba neturi prieinamų laikų</p>');
+                return;
+            }
+
+            teachers.forEach(function(teacher) {
+                const item = $('<div class="pm-list-item">')
+                    .html('<strong>' + teacher.first_name + ' ' + teacher.last_name + '</strong>')
+                    .data('teacher', teacher)
+                    .on('click', function() {
+                        selectTeacher(teacher);
+                    });
+                list.append(item);
+            });
+        }
+
+        function selectTeacher(teacher) {
+            selectedTeacher = teacher;
+
+            $('.pm-list-item').removeClass('pm-selected');
+            $('#pm-teacher-list .pm-list-item').filter(function() {
+                return $(this).data('teacher').id === teacher.id;
+            }).addClass('pm-selected');
+
+            // Show only available meeting types
+            const types = JSON.parse(teacher.meeting_types);
+            $('input[name="pm_meeting_type"]').each(function() {
+                const input = $(this);
+                const value = input.val();
+
+                if (types.includes(value)) {
+                    input.parent().show();
+                } else {
+                    input.parent().hide();
+                }
+            });
+
+            goToStep(3);
+        }
+
+        // Meeting type selection
+        $('input[name="pm_meeting_type"]').on('change', function() {
+            selectedType = $(this).val();
+            $('#pm-selected-type').val(selectedType);
+
+            goToStep(4);
+            loadTimeSlots(selectedTeacher.id, selectedType);
+        });
+
+        function loadTimeSlots(teacherId, meetingType) {
+            showLoading();
+
+            var projectId = pmFrontend.project_id || 0;
+
+            $.ajax({
+                url: pmFrontend.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'pm_get_time_slots',
+                    teacher_id: teacherId,
+                    meeting_type: meetingType,
+                    project_id: projectId,
+                    nonce: pmFrontend.nonce
+                },
+                success: function(response) {
+                    hideLoading();
+
+                    if (response.success) {
+                        renderCalendar(response.data.slots, response.data.message);
+                    } else {
+                        $('#pm-calendar').html('<p class="pm-empty">Laisvų laikų nėra</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    showError('Įvyko klaida. Bandykite perkrauti puslapį.');
+                }
+            });
+        }
+
+        function renderCalendar(slots, message) {
+            const calendar = $('#pm-calendar');
+            calendar.empty();
+
+            // Show teacher message if exists
+            if (message) {
+                $('#pm-teacher-message').html(message).show();
+            } else {
+                $('#pm-teacher-message').hide();
+            }
+
+            if (Object.keys(slots).length === 0) {
+                calendar.append('<p class="pm-empty">Laisvų laikų nėra artimiausioms dviem savaitėms</p>');
+                return;
+            }
+
+            const weekDays = ['Sekmadienis', 'Pirmadienis', 'Antradienis', 'Trečiadienis', 'Ketvirtadienis', 'Penktadienis', 'Šeštadienis'];
+            const monthNames = ['Sau', 'Vas', 'Kov', 'Bal', 'Geg', 'Bir', 'Lie', 'Rgp', 'Rgs', 'Spa', 'Lap', 'Grd'];
+
+            for (const [date, timeSlots] of Object.entries(slots)) {
+                const dateObj = new Date(date + 'T00:00:00');
+                const dayName = weekDays[dateObj.getDay()];
+                const day = dateObj.getDate();
+                const month = monthNames[dateObj.getMonth()];
+
+                const dayColumn = $('<div class="pm-day-column">');
+
+                const header = $('<div class="pm-day-header">');
+                header.append('<div class="pm-day-name">' + dayName + '</div>');
+                header.append('<div class="pm-day-date">' + day + ' ' + month + '</div>');
+                dayColumn.append(header);
+
+                const slotsList = $('<div class="pm-slots-list">');
+
+                timeSlots.forEach(function(slot) {
+                    const slotBtn = $('<button class="pm-slot-btn" type="button">')
+                        .text(slot.start)
+                        .data('slot', slot)
+                        .on('click', function() {
+                            selectSlot(slot);
+                        });
+                    slotsList.append(slotBtn);
+                });
+
+                dayColumn.append(slotsList);
+                calendar.append(dayColumn);
+            }
+        }
+
+        function selectSlot(slot) {
+            selectedSlot = slot;
+            $('#pm-selected-slot').val(slot.id);
+
+            $('.pm-slot-btn').removeClass('pm-selected');
+            $('.pm-slot-btn').filter(function() {
+                return $(this).data('slot').id === slot.id;
+            }).addClass('pm-selected');
+
+            goToStep(5);
+        }
+
+        // Final form submission
+        $('#pm-final-form').on('submit', function(e) {
+            e.preventDefault();
+
+            if (!selectedSlot) {
+                showError('Prašome pasirinkti laiką');
+                return;
+            }
+
+            showLoading();
+
+            // Check if reCAPTCHA is configured and loaded
+            if (typeof grecaptcha !== 'undefined' && pmFrontend.recaptcha_key && pmFrontend.recaptcha_key !== 'YOUR_RECAPTCHA_SITE_KEY_HERE') {
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(pmFrontend.recaptcha_key, {action: 'booking'}).then(function(token) {
+                        submitBooking(token);
+                    });
+                });
+            } else {
+                // Submit without reCAPTCHA if not configured
+                submitBooking('');
+            }
+        });
+
+        function submitBooking(recaptchaToken) {
+            const formData = $('#pm-final-form').serializeArray();
+            const data = {
+                action: 'pm_book_meeting',
+                nonce: pmFrontend.nonce,
+                recaptcha_token: recaptchaToken
+            };
+
+            formData.forEach(function(item) {
+                data[item.name] = item.value;
+            });
+
+            $.ajax({
+                url: pmFrontend.ajaxurl,
+                type: 'POST',
+                data: data,
+                success: function(response) {
+                    hideLoading();
+
+                    if (response.success) {
+                        showConfirmation();
+                    } else {
+                        showError(response.data);
+
+                        // Reload slots if time was taken
+                        if (response.data.includes('užimtas')) {
+                            loadTimeSlots(selectedTeacher.id, selectedType);
+                            goToStep(4);
+                        }
+                    }
+                },
+                error: function() {
+                    hideLoading();
+                    showError('Įvyko klaida. Prašome bandyti dar kartą.');
+                }
+            });
+        }
+
+        function goToStep(step) {
+            $('.pm-step').removeClass('pm-step-active');
+            $('.pm-step[data-step="' + step + '"]').addClass('pm-step-active');
+
+            // Show previous steps as completed
+            $('.pm-step').each(function() {
+                const stepNum = parseInt($(this).data('step'));
+                if (stepNum < step) {
+                    $(this).addClass('pm-step-completed');
+                }
+            });
+
+            // Scroll to top of form
+            $('html, body').animate({
+                scrollTop: $('#pm-booking-form').offset().top - 50
+            }, 300);
+        }
+
+        function showConfirmation() {
+            $('#pm-booking-form .pm-step').hide();
+            $('#pm-confirmation').fadeIn();
+        }
+
+        function showLoading() {
+            $('#pm-loading').show();
+        }
+
+        function hideLoading() {
+            $('#pm-loading').hide();
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+    }
+
+    // Start initialization when DOM is ready
+    $(document).ready(function() {
+        waitForPmFrontend();
+    });
+
+})(jQuery);
