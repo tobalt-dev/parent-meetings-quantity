@@ -60,6 +60,7 @@ class PM_Admin {
                         PM_Projects::assign_classes($project_id, array_map('intval', $_POST['class_ids']));
                     }
 
+                    self::clear_classes_cache();
                     wp_redirect(admin_url('admin.php?page=pm-projects&added=1'));
                     exit;
                 } else {
@@ -110,6 +111,7 @@ class PM_Admin {
                     PM_Projects::assign_classes($project_id, []);
                 }
 
+                self::clear_classes_cache();
                 wp_redirect(admin_url('admin.php?page=pm-projects&updated=1'));
                 exit;
             }
@@ -118,6 +120,7 @@ class PM_Admin {
             if (isset($_POST['pm_delete_project'])) {
                 $project_id = intval($_POST['pm_delete_project']);
                 check_admin_referer('pm_delete_project_' . $project_id);
+                self::clear_classes_cache();
                 $result = PM_Projects::delete($project_id);
                 if (is_wp_error($result)) {
                     wp_redirect(admin_url('admin.php?page=pm-projects&error=' . $result->get_error_code()));
@@ -141,17 +144,19 @@ class PM_Admin {
                 $name = sanitize_text_field($_POST['class_name']);
                 if (!empty($name)) {
                     $wpdb->insert($wpdb->prefix . 'pm_classes', ['name' => $name]);
+                    self::clear_classes_cache();
                     wp_redirect(admin_url('admin.php?page=parent-meetings&class_added=1'));
                     exit;
                 }
             }
-            
+
             // Delete class (POST only for CSRF protection)
             if (isset($_POST['pm_delete_class'])) {
                 global $wpdb;
                 $class_id = intval($_POST['pm_delete_class']);
                 check_admin_referer('pm_delete_class_' . $class_id);
                 $wpdb->delete($wpdb->prefix . 'pm_classes', ['id' => $class_id]);
+                self::clear_classes_cache();
                 wp_redirect(admin_url('admin.php?page=parent-meetings&class_deleted=1'));
                 exit;
             }
@@ -628,5 +633,18 @@ class PM_Admin {
         $all_projects = PM_Projects::get_all();
 
         include PM_PLUGIN_DIR . 'templates/admin-analytics.php';
+    }
+
+    /**
+     * Clear classes cache when classes are modified
+     */
+    private static function clear_classes_cache() {
+        global $wpdb;
+        // Delete all pm_classes_* transients
+        $wpdb->query(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE '_transient_pm_classes_%'
+             OR option_name LIKE '_transient_timeout_pm_classes_%'"
+        );
     }
 }

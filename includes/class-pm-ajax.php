@@ -8,22 +8,28 @@ class PM_Ajax {
         global $wpdb;
 
         $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+        $cache_key = 'pm_classes_' . $project_id;
+        $classes = get_transient($cache_key);
 
-        if ($project_id > 0) {
-            // Get classes for specific project
-            $classes = $wpdb->get_results($wpdb->prepare(
-                "SELECT c.id, c.name
-                 FROM {$wpdb->prefix}pm_classes c
-                 INNER JOIN {$wpdb->prefix}pm_class_projects cp ON c.id = cp.class_id
-                 WHERE cp.project_id = %d
-                 ORDER BY c.name",
-                $project_id
-            ));
-        } else {
-            // Get all classes
-            $classes = $wpdb->get_results(
-                "SELECT id, name FROM {$wpdb->prefix}pm_classes ORDER BY name"
-            );
+        if (false === $classes) {
+            if ($project_id > 0) {
+                // Get classes for specific project
+                $classes = $wpdb->get_results($wpdb->prepare(
+                    "SELECT c.id, c.name
+                     FROM {$wpdb->prefix}pm_classes c
+                     INNER JOIN {$wpdb->prefix}pm_class_projects cp ON c.id = cp.class_id
+                     WHERE cp.project_id = %d
+                     ORDER BY c.name",
+                    $project_id
+                ));
+            } else {
+                // Get all classes
+                $classes = $wpdb->get_results(
+                    "SELECT id, name FROM {$wpdb->prefix}pm_classes ORDER BY name"
+                );
+            }
+            // Cache for 1 hour (invalidated on admin changes)
+            set_transient($cache_key, $classes, HOUR_IN_SECONDS);
         }
 
         wp_send_json_success($classes);
