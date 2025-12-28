@@ -1,0 +1,159 @@
+.pm-admin-section {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.pm-admin-section h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.pm-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pm-status-confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.pm-status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.pm-attendance {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pm-attendance-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.pm-attendance-attended {
+    background: #d4edda;
+    color: #155724;
+}
+
+.pm-attendance-missed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Help Tooltips */
+.pm-help-tip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    color: #666;
+    font-size: 16px;
+    text-decoration: none !important;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.pm-help-tip:hover {
+    color: #2271b1;
+}
+
+.pm-help-tip::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    padding: 10px 14px;
+    background: #2c3338 !important;
+    color: #fff !important;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    line-height: 1.5;
+    white-space: normal;
+    word-wrap: break-word;
+    min-width: 200px;
+    max-width: 400px;
+    width: max-content;
+    z-index: 999999;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    font-weight: normal;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.pm-help-tip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pm-help-tip::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 5px;
+    border: 6px solid transparent;
+    border-right-color: #2c3338;
+    z-index: 999999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.pm-help-tip:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Adjust tooltip position for narrow spaces */
+th .pm-help-tip::after {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 10px;
+    white-space: normal;
+}
+
+th .pm-help-tip::before {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 5px;
+    border-right-color: transparent;
+    border-left-color: #2c3338;
+}
+
+/* Allow wrapping in tooltips for long text */
+label .pm-help-tip::after {
+    white-space: normal;
+}
+
+/* Project badges */
+.pm-project-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    margin: 2px;
+    background: #2271b1;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+}

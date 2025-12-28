@@ -1,0 +1,355 @@
+# Lithuanian translation for Parent Meetings plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: Parent Meetings 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-09 13:00+0000\n"
+"PO-Revision-Date: 2025-11-09 13:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Lithuanian\n"
+"Language: lt_LT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+# Settings page
+msgid "Settings"
+msgstr "Nustatymai"
+
+msgid "General Settings"
+msgstr "Bendri nustatymai"
+
+msgid "Configure general plugin settings."
+msgstr "Konfigūruokite bendrus įskiepio nustatymus."
+
+msgid "Default Meeting Duration (minutes)"
+msgstr "Numatytoji susitikimo trukmė (minutės)"
+
+msgid "Default duration for meetings in minutes."
+msgstr "Numatytoji susitikimų trukmė minutėmis."
+
+msgid "Default Buffer Time (minutes)"
+msgstr "Numatytasis pertraukos laikas (minutės)"
+
+msgid "Buffer time between meetings."
+msgstr "Pertraukos laikas tarp susitikimų."
+
+msgid "Minimum Hours in Advance for Booking"
+msgstr "Minimalus užsakymo laikas iš anksto (valandomis)"
+
+msgid "Minimum hours in advance parents must book."
+msgstr "Minimalus valandų skaičius, per kurį tėvai privalo užsiregistruoti."
+
+msgid "Default Timezone"
+msgstr "Numatytoji laiko juosta"
+
+msgid "Default timezone for meetings."
+msgstr "Numatytoji laiko juosta susitikimams."
+
+msgid "reCAPTCHA Settings"
+msgstr "reCAPTCHA nustatymai"
+
+msgid "Get your reCAPTCHA keys from <a href=\"%s\" target=\"_blank\">Google reCAPTCHA Admin</a>."
+msgstr "Gaukite reCAPTCHA raktus iš <a href=\"%s\" target=\"_blank\">Google reCAPTCHA Admin</a>."
+
+msgid "reCAPTCHA Site Key"
+msgstr "reCAPTCHA svetainės raktas"
+
+msgid "reCAPTCHA Secret Key"
+msgstr "reCAPTCHA slaptasis raktas"
+
+msgid "Enable reCAPTCHA"
+msgstr "Įjungti reCAPTCHA"
+
+msgid "Enable reCAPTCHA verification for bookings."
+msgstr "Įjungti reCAPTCHA patikrinimą rezervacijoms."
+
+msgid "Email Settings"
+msgstr "El. pašto nustatymai"
+
+msgid "Configure email notifications."
+msgstr "Konfigūruokite el. pašto pranešimus."
+
+msgid "Email From Name"
+msgstr "Siuntėjo vardas"
+
+msgid "Email From Address"
+msgstr "Siuntėjo el. paštas"
+
+msgid "Send 24-Hour Reminders"
+msgstr "Siųsti priminimus prieš 24 val."
+
+msgid "Send automatic reminders 24 hours before meetings."
+msgstr "Siųsti automatinius priminimus 24 valandas prieš susitikimus."
+
+msgid "Include iCal Attachments"
+msgstr "Įtraukti iCal priedus"
+
+msgid "Include iCal attachments in confirmation emails."
+msgstr "Įtraukti iCal priedus į patvirtinimo laiškus."
+
+msgid "Advanced Settings"
+msgstr "Išplėstiniai nustatymai"
+
+msgid "Advanced configuration options."
+msgstr "Išplėstinės konfigūracijos parinktys."
+
+msgid "Enable Waiting List"
+msgstr "Įjungti laukiančiųjų sąrašą"
+
+msgid "Allow parents to join waiting list for full slots."
+msgstr "Leisti tėvams prisijungti prie laukiančiųjų sąrašo užimtiems laikams."
+
+msgid "Magic Link Expiry (days)"
+msgstr "Magijos nuorodos galiojimas (dienomis)"
+
+msgid "Number of days before magic links expire."
+msgstr "Dienų skaičius, po kurio magijos nuorodos nebegalioja."
+
+msgid "Delete Old Data After (days, 0 = never)"
+msgstr "Ištrinti senus duomenis po (dienų, 0 = niekada)"
+
+msgid "Automatically delete bookings and slots older than this. Set to 0 to keep forever."
+msgstr "Automatiškai ištrinti rezervacijas ir laikus senesnius nei nurodytas laikotarpis. Nustatykite 0, kad saugoti amžinai."
+
+msgid "Enable Teacher Meeting Notes"
+msgstr "Įjungti mokytojų susitikimų pastabas"
+
+msgid "Allow teachers to add private notes after meetings."
+msgstr "Leisti mokytojams pridėti privačias pastabas po susitikimų."
+
+msgid "Settings saved successfully."
+msgstr "Nustatymai sėkmingai išsaugoti."
+
+msgid "Save Settings"
+msgstr "Išsaugoti nustatymus"
+
+# Admin menu
+msgid "Parent Meetings"
+msgstr "Tėvų susitikimai"
+
+msgid "Meetings"
+msgstr "Susitikimai"
+
+msgid "Classes"
+msgstr "Klasės"
+
+msgid "Teachers"
+msgstr "Mokytojai"
+
+msgid "Bookings"
+msgstr "Rezervacijos"
+
+# Admin messages
+msgid "Demo data created successfully! Check teachers and bookings."
+msgstr "Demo duomenys sėkmingai sukurti! Peržiūrėkite mokytojus ir rezervacijas."
+
+msgid "Class added successfully."
+msgstr "Klasė pridėta sėkmingai."
+
+msgid "Class deleted."
+msgstr "Klasė ištrinta."
+
+msgid "Teacher added and invitation sent."
+msgstr "Mokytojas pridėtas ir kvietimas išsiųstas."
+
+msgid "Teacher deleted."
+msgstr "Mokytojas ištrintas."
+
+msgid "Links refreshed and sent."
+msgstr "Nuorodos atnaujintos ir išsiųstos."
+
+# Frontend messages
+msgid "There are no available meeting times at the moment."
+msgstr "Šiuo metu nėra galimų susitikimo laikų."
+
+msgid "Link is invalid or expired."
+msgstr "Nuoroda negalioja arba pasibaigė."
+
+# AJAX error messages
+msgid "Class not specified."
+msgstr "Klasė nenurodyta."
+
+msgid "Teacher not specified."
+msgstr "Mokytojas nenurodytas."
+
+msgid "Invalid meeting type."
+msgstr "Netinkamas susitikimo tipas."
+
+msgid "Please select a time slot."
+msgstr "Prašome pasirinkti laiko tarpą."
+
+msgid "Please enter your name."
+msgstr "Prašome įvesti savo vardą."
+
+msgid "Please enter a valid email address."
+msgstr "Prašome įvesti galiojantį el. pašto adresą."
+
+msgid "Bookings must be made at least %d hour(s) in advance."
+msgstr "Rezervacijos turi būti atliekamos bent %d valandą(-as) iš anksto."
+
+msgid "This time slot was just booked. Please select another time."
+msgstr "Šis laikas ką tik užimtas. Prašome pasirinkti kitą laiką."
+
+msgid "You already have a booking at the same time with another teacher."
+msgstr "Jūs jau turite rezervaciją tuo pačiu laiku su kitu mokytoju."
+
+msgid "Meeting booked successfully! Check your email for confirmation."
+msgstr "Susitikimas sėkmingai užregistruotas! Patikrinkite savo el. paštą."
+
+msgid "reCAPTCHA verification failed. Please try again."
+msgstr "reCAPTCHA patikrinimas nepavyko. Bandykite dar kartą."
+
+# Reschedule messages
+msgid "Invalid reschedule request."
+msgstr "Netinkamas perkėlimo užklausa."
+
+msgid "Booking not found or invalid token."
+msgstr "Rezervacija nerasta arba netinkamas raktas."
+
+msgid "This booking has already been cancelled."
+msgstr "Ši rezervacija jau atšaukta."
+
+msgid "The selected time slot is no longer available."
+msgstr "Pasirinktas laikas nebeprieinamas."
+
+msgid "You can only reschedule with the same teacher."
+msgstr "Galite perkelti tik su tuo pačiu mokytoju."
+
+msgid "You have another booking at this time."
+msgstr "Jūs turite kitą rezervaciją šiuo laiku."
+
+msgid "Meeting rescheduled successfully!"
+msgstr "Susitikimas sėkmingai perkeltas!"
+
+# Email subjects and content
+msgid "Reminder: Meeting Tomorrow"
+msgstr "Priminimas: Susitikimas rytoj"
+
+msgid "Hello %s!\n\nThis is a reminder about your meeting tomorrow:\n\nTeacher: %s %s\nDate: %s\nTime: %s - %s\nType: %s\n\nTo cancel:\n%s\n\nBest regards,\nSchool Administration"
+msgstr "Sveiki, %s!\n\nPriminame apie rytojaus susitikimą:\n\nMokytojas: %s %s\nData: %s\nLaikas: %s - %s\nTipas: %s\n\nAtšaukti:\n%s\n\nPagarbiai,\nMokyklos administracija"
+
+msgid "Meeting Rescheduled"
+msgstr "Susitikimas perkeltas"
+
+msgid "Hello %s!\n\nYour meeting has been rescheduled:\n\nTeacher: %s %s\n\nOld time: %s at %s\nNew time: %s at %s\n\nBest regards,\nSchool Administration"
+msgstr "Sveiki, %s!\n\nJūsų susitikimas buvo perkeltas:\n\nMokytojas: %s %s\n\nSenas laikas: %s %s\nNaujas laikas: %s %s\n\nPagarbiai,\nMokyklos administracija"
+
+msgid "Hello %s %s!\n\nParent %s has rescheduled their meeting:\n\nOld time: %s at %s\nNew time: %s at %s\n\nBest regards,\nSystem"
+msgstr "Sveiki, %s %s!\n\nTėvas %s perkėlė susitikimą:\n\nSenas laikas: %s %s\nNaujas laikas: %s %s\n\nPagarbiai,\nSistema"
+
+msgid "Meeting with %s %s"
+msgstr "Susitikimas su %s %s"
+
+msgid "Parent-teacher meeting - Type: %s"
+msgstr "Tėvų susitikimas - Tipas: %s"
+
+# Cron
+msgid "Every Hour"
+msgstr "Kas valandą"
+
+# Email specific
+msgid "Teacher:"
+msgstr "Mokytojas:"
+
+msgid "Date:"
+msgstr "Data:"
+
+msgid "Time:"
+msgstr "Laikas:"
+
+msgid "Type:"
+msgstr "Tipas:"
+
+msgid "Hello %s!"
+msgstr "Sveiki, %s!"
+
+msgid "Reminder: Your meeting is tomorrow!"
+msgstr "Priminimas: Jūsų susitikimas yra rytoj!"
+
+msgid "Cancel Meeting"
+msgstr "Atšaukti susitikimą"
+
+msgid "Best regards,"
+msgstr "Pagarbiai,"
+
+msgid "School Administration"
+msgstr "Mokyklos administracija"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Your meeting has been rescheduled"
+msgstr "Jūsų susitikimas buvo perkeltas"
+
+msgid "Old Time"
+msgstr "Senas laikas"
+
+msgid "New Time"
+msgstr "Naujas laikas"
+
+msgid "Hello %s %s!"
+msgstr "Sveiki, %s %s!"
+
+msgid "Parent <strong>%s</strong> has rescheduled their meeting:"
+msgstr "Tėvas <strong>%s</strong> perkėlė susitikimą:"
+
+# Error messages for duplicate handling
+msgid "A teacher with this email already exists. Please use a different email address."
+msgstr "Mokytojas su šiuo el. paštu jau egzistuoja. Prašome naudoti kitą el. pašto adresą."
+
+msgid "Invalid email address. Please enter a valid email."
+msgstr "Netinkamas el. pašto adresas. Prašome įvesti galiojantį el. paštą."
+
+msgid "Database error occurred. Please try again."
+msgstr "Įvyko duomenų bazės klaida. Bandykite dar kartą."
+
+# Reschedule functionality
+msgid "Reschedule Meeting"
+msgstr "Perkelti susitikimą"
+
+msgid "Cancellation link is invalid."
+msgstr "Atšaukimo nuoroda negalioja."
+
+msgid "Meeting has already started, cannot cancel."
+msgstr "Susitikimas jau prasidėjo, atšaukti nebegalima."
+
+msgid "Meeting Successfully Cancelled"
+msgstr "Susitikimas sėkmingai atšauktas"
+
+msgid "The teacher has been notified about the cancellation."
+msgstr "Mokytojas gavo pranešimą apie atšaukimą."
+
+msgid "Reschedule link is invalid."
+msgstr "Perkėlimo nuoroda negalioja."
+
+msgid "Meeting has already started, cannot reschedule."
+msgstr "Susitikimas jau prasidėjo, perkelti nebegalima."
+
+msgid "Current Booking"
+msgstr "Dabartinė rezervacija"
+
+msgid "Current Time:"
+msgstr "Dabartinis laikas:"
+
+msgid "Meeting Type:"
+msgstr "Susitikimo tipas:"
+
+msgid "Sorry, there are no available time slots for this teacher at the moment. Please try again later or cancel your current booking."
+msgstr "Atsiprašome, šiuo metu šiam mokytojui nėra laisvų laikų. Bandykite vėliau arba atšaukite dabartinę rezervaciją."
+
+msgid "Cancel Current Booking"
+msgstr "Atšaukti dabartinę rezervaciją"
+
+msgid "Select New Time Slot"
+msgstr "Pasirinkite naują laiko tarpą"
+
+msgid "Choose a new time slot from the available options below:"
+msgstr "Pasirinkite naują laiko tarpą iš žemiau esančių galimybių:"
+
+msgid "Confirm Reschedule"
+msgstr "Patvirtinti perkėlimą"
+
+msgid "Or Cancel Booking"
+msgstr "Arba atšaukti rezervaciją"
