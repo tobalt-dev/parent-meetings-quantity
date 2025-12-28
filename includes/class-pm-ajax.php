@@ -34,13 +34,18 @@ class PM_Ajax {
 
         global $wpdb;
 
-        $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
-        $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+        $class_id = isset($_POST['class_id']) ? absint($_POST['class_id']) : 0;
+        $project_id = isset($_POST['project_id']) ? absint($_POST['project_id']) : 0;
 
         // Build the query based on parameters
         if ($project_id > 0) {
             // Filter by project
             if ($class_id > 0) {
+                // Sanitize class_id for JSON_CONTAINS - ensure it's a clean integer string
+                $class_id_json = wp_json_encode( $class_id );
+                if ( false === $class_id_json || ! is_numeric( json_decode( $class_id_json ) ) ) {
+                    wp_send_json_error( __( 'Invalid class ID.', 'parent-meetings' ) );
+                }
                 // Filter by both project and class
                 $teachers = $wpdb->get_results($wpdb->prepare(
                     "SELECT DISTINCT t.id, t.first_name, t.last_name, t.meeting_types
@@ -62,7 +67,7 @@ class PM_Ajax {
                      )
                      ORDER BY t.last_name, t.first_name",
                     $project_id,
-                    json_encode($class_id),
+                    $class_id_json,
                     $project_id
                 ));
             } else {
@@ -90,6 +95,12 @@ class PM_Ajax {
                 wp_send_json_error(__('Class not specified.', 'parent-meetings'));
             }
 
+            // Sanitize class_id for JSON_CONTAINS - ensure it's a clean integer string
+            $class_id_json = wp_json_encode( $class_id );
+            if ( false === $class_id_json || ! is_numeric( json_decode( $class_id_json ) ) ) {
+                wp_send_json_error( __( 'Invalid class ID.', 'parent-meetings' ) );
+            }
+
             $teachers = $wpdb->get_results($wpdb->prepare(
                 "SELECT DISTINCT t.id, t.first_name, t.last_name, t.meeting_types
                  FROM {$wpdb->prefix}pm_teachers t
@@ -101,7 +112,7 @@ class PM_Ajax {
                      AND s.start_time > NOW()
                  )
                  ORDER BY t.last_name, t.first_name",
-                json_encode($class_id)
+                $class_id_json
             ));
         }
 
