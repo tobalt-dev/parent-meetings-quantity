@@ -300,16 +300,16 @@ class PM_Ajax {
 
         global $wpdb;
 
-        // Sanitize and validate inputs
+        // Sanitize and validate inputs with length limits
         $slot_id = isset($_POST['slot_id']) ? intval($_POST['slot_id']) : 0;
-        $parent_name = isset($_POST['parent_name']) ? sanitize_text_field(trim($_POST['parent_name'])) : '';
-        $parent_email = isset($_POST['parent_email']) ? sanitize_email(trim($_POST['parent_email'])) : '';
-        $parent_phone = isset($_POST['parent_phone']) ? sanitize_text_field(trim($_POST['parent_phone'])) : '';
-        $student_name = isset($_POST['student_name']) ? sanitize_text_field(trim($_POST['student_name'])) : '';
+        $parent_name = isset($_POST['parent_name']) ? mb_substr(sanitize_text_field(trim($_POST['parent_name'])), 0, 100) : '';
+        $parent_email = isset($_POST['parent_email']) ? mb_substr(sanitize_email(trim($_POST['parent_email'])), 0, 254) : '';
+        $parent_phone = isset($_POST['parent_phone']) ? mb_substr(sanitize_text_field(trim($_POST['parent_phone'])), 0, 20) : '';
+        $student_name = isset($_POST['student_name']) ? mb_substr(sanitize_text_field(trim($_POST['student_name'])), 0, 100) : '';
         $class_id = isset($_POST['class_id']) ? intval($_POST['class_id']) : 0;
         $meeting_type = isset($_POST['meeting_type']) ? sanitize_text_field($_POST['meeting_type']) : '';
         $project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
-        $notes = isset($_POST['notes']) ? sanitize_textarea_field(trim($_POST['notes'])) : '';
+        $notes = isset($_POST['notes']) ? mb_substr(sanitize_textarea_field(trim($_POST['notes'])), 0, 1000) : '';
         $booking_mode = isset($_POST['booking_mode']) ? sanitize_text_field($_POST['booking_mode']) : 'time';
 
         // Validate required fields
@@ -350,27 +350,10 @@ class PM_Ajax {
     private static function book_time_meeting($slot_id, $parent_name, $parent_email, $parent_phone, $student_name, $class_id, $meeting_type, $project_id, $notes) {
         global $wpdb;
 
-        // Check minimum advance booking time
-        $advance_hours = PM_Settings::get_option('booking_advance_hours', 1);
-        $min_booking_time = date('Y-m-d H:i:s', strtotime("+{$advance_hours} hours"));
-
-        $slot_start_time = $wpdb->get_var($wpdb->prepare(
-            "SELECT start_time FROM {$wpdb->prefix}pm_slots WHERE id = %d",
-            $slot_id
-        ));
-
-        if ($slot_start_time && $slot_start_time < $min_booking_time) {
-            wp_send_json_error(
-                sprintf(
-                    __('Bookings must be made at least %d hour(s) in advance.', 'parent-meetings'),
-                    $advance_hours
-                )
-            );
-        }
-
-        // Check slot availability (with lock)
+        // START TRANSACTION FIRST to prevent race conditions
         $wpdb->query('START TRANSACTION');
 
+        // Lock the slot immediately with FOR UPDATE
         $slot = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$wpdb->prefix}pm_slots WHERE id = %d FOR UPDATE",
             $slot_id
@@ -381,14 +364,29 @@ class PM_Ajax {
             wp_send_json_error(__('This time slot was just booked. Please select another time.', 'parent-meetings'));
         }
 
-        // Check for overlapping bookings for this parent
+        // Check minimum advance booking time (now inside transaction with lock)
+        $advance_hours = PM_Settings::get_option('booking_advance_hours', 1);
+        $min_booking_time = date('Y-m-d H:i:s', strtotime("+{$advance_hours} hours"));
+
+        if ($slot->start_time < $min_booking_time) {
+            $wpdb->query('ROLLBACK');
+            wp_send_json_error(
+                sprintf(
+                    __('Bookings must be made at least %d hour(s) in advance.', 'parent-meetings'),
+                    $advance_hours
+                )
+            );
+        }
+
+        // Check for overlapping bookings for this parent (with FOR UPDATE lock)
         $overlap = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$wpdb->prefix}pm_bookings b
              JOIN {$wpdb->prefix}pm_slots s ON b.slot_id = s.id
              WHERE b.parent_email = %s
              AND b.status = 'confirmed'
              AND s.start_time <= %s
-             AND s.end_time >= %s",
+             AND s.end_time >= %s
+             FOR UPDATE",
             $parent_email,
             $slot->end_time,
             $slot->start_time
@@ -457,9 +455,11 @@ class PM_Ajax {
             wp_send_json_error(__('Invalid slot selected.', 'parent-meetings'));
         }
 
-        // Count current bookings for this slot
+        // Count current bookings for this slot (with FOR UPDATE lock to prevent race conditions)
         $booked_count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}pm_bookings WHERE slot_id = %d AND status = 'confirmed'",
+            "SELECT COUNT(*) FROM {$wpdb->prefix}pm_bookings
+             WHERE slot_id = %d AND status = 'confirmed'
+             FOR UPDATE",
             $slot_id
         ));
 
@@ -468,10 +468,11 @@ class PM_Ajax {
             wp_send_json_error(__('No more spots available for this date. Please select another date.', 'parent-meetings'));
         }
 
-        // Check if parent already has booking for this slot/date
+        // Check if parent already has booking for this slot/date (with FOR UPDATE lock)
         $existing = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$wpdb->prefix}pm_bookings
-             WHERE slot_id = %d AND parent_email = %s AND status = 'confirmed'",
+             WHERE slot_id = %d AND parent_email = %s AND status = 'confirmed'
+             FOR UPDATE",
             $slot_id,
             $parent_email
         ));
@@ -481,8 +482,13 @@ class PM_Ajax {
             wp_send_json_error(__('You already have a registration for this date.', 'parent-meetings'));
         }
 
-        // Assign position number (next available)
-        $position_number = $booked_count + 1;
+        // Assign position number atomically using MAX (safer than COUNT for race conditions)
+        $max_position = $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(MAX(position_number), 0) FROM {$wpdb->prefix}pm_bookings
+             WHERE slot_id = %d AND status = 'confirmed'",
+            $slot_id
+        ));
+        $position_number = $max_position + 1;
 
         // Create booking
         $cancel_token = bin2hex(random_bytes(32));

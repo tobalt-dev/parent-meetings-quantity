@@ -68,9 +68,11 @@
                         </td>
                         <td><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($class->created_at))); ?></td>
                         <td>
-                            <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=parent-meetings&delete=' . $class->id), 'pm_delete_class_' . $class->id); ?>"
-                               class="button button-small"
-                               onclick="return confirm('Ar tikrai norite ištrinti šią klasę?');">Ištrinti</a>
+                            <form method="post" style="display:inline;" onsubmit="return confirm('Ar tikrai norite ištrinti šią klasę?');">
+                                <?php wp_nonce_field('pm_delete_class_' . $class->id); ?>
+                                <input type="hidden" name="pm_delete_class" value="<?php echo esc_attr($class->id); ?>">
+                                <button type="submit" class="button button-small">Ištrinti</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

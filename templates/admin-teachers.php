@@ -187,9 +187,11 @@
                                class="button button-small button-primary">Redaguoti</a>
                             <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=pm-teachers&regenerate=' . $teacher->id), 'pm_regenerate_' . $teacher->id); ?>"
                                class="button button-small">Atnaujinti nuorodas</a>
-                            <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=pm-teachers&delete=' . $teacher->id), 'pm_delete_teacher_' . $teacher->id); ?>"
-                               class="button button-small"
-                               onclick="return confirm('Ar tikrai norite ištrinti šį mokytoją?');">Ištrinti</a>
+                            <form method="post" style="display:inline;" onsubmit="return confirm('Ar tikrai norite ištrinti šį mokytoją?');">
+                                <?php wp_nonce_field('pm_delete_teacher_' . $teacher->id); ?>
+                                <input type="hidden" name="pm_delete_teacher" value="<?php echo esc_attr($teacher->id); ?>">
+                                <button type="submit" class="button button-small">Ištrinti</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

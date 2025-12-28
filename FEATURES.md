@@ -7,7 +7,7 @@
 -  add security improvements, rate limiting, and error logging
 
 ## Bug Fixes
-
+-  add SQL injection protection for JSON_CONTAINS queries
 
 ## Refactoring
 

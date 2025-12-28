@@ -379,11 +379,11 @@ function pm_help_tip($text) {
                     <a href="<?php echo esc_url(admin_url('admin.php?page=pm-projects&edit=' . $project->id)); ?>" class="button button-small">
                         Redaguoti
                     </a>
-                    <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=pm-projects&delete=' . $project->id), 'pm_delete_project_' . $project->id)); ?>"
-                       class="button button-small"
-                       onclick="return confirm('Ar tikrai norite ištrinti šį projektą?')">
-                        Ištrinti
-                    </a>
+                    <form method="post" style="display:inline;" onsubmit="return confirm('Ar tikrai norite ištrinti šį projektą?');">
+                        <?php wp_nonce_field('pm_delete_project_' . $project->id); ?>
+                        <input type="hidden" name="pm_delete_project" value="<?php echo esc_attr($project->id); ?>">
+                        <button type="submit" class="button button-small">Ištrinti</button>
+                    </form>
                 </td>
             </tr>
             <?php endforeach; ?>

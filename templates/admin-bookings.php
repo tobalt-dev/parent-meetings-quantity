@@ -129,17 +129,17 @@
                     </td>
                     <td>
                         <?php if ($booking->status === 'confirmed') : ?>
-                            <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=pm-bookings&cancel_booking=' . $booking->id), 'pm_cancel_booking_' . $booking->id)); ?>"
-                               class="button button-small"
-                               onclick="return confirm('Ar tikrai norite atšaukti šią rezervaciją?')">
-                                Atšaukti
-                            </a>
+                            <form method="post" style="display:inline;" onsubmit="return confirm('Ar tikrai norite atšaukti šią rezervaciją?');">
+                                <?php wp_nonce_field('pm_cancel_booking_' . $booking->id); ?>
+                                <input type="hidden" name="pm_cancel_booking" value="<?php echo esc_attr($booking->id); ?>">
+                                <button type="submit" class="button button-small">Atšaukti</button>
+                            </form>
                         <?php endif; ?>
-                        <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=pm-bookings&delete_booking=' . $booking->id), 'pm_delete_booking_' . $booking->id)); ?>"
-                           class="button button-small"
-                           onclick="return confirm('Ar tikrai norite ištrinti šią rezervaciją? Šio veiksmo negalima atšaukti.')">
-                            Ištrinti
-                        </a>
+                        <form method="post" style="display:inline;" onsubmit="return confirm('Ar tikrai norite ištrinti šią rezervaciją? Šio veiksmo negalima atšaukti.');">
+                            <?php wp_nonce_field('pm_delete_booking_' . $booking->id); ?>
+                            <input type="hidden" name="pm_delete_booking" value="<?php echo esc_attr($booking->id); ?>">
+                            <button type="submit" class="button button-small">Ištrinti</button>
+                        </form>
                     </td>
                 </tr>
                 <?php endforeach; ?>

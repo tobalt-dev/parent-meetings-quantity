@@ -114,9 +114,11 @@ class PM_Admin {
                 exit;
             }
 
-            // Delete project
-            if (isset($_GET['delete']) && check_admin_referer('pm_delete_project_' . $_GET['delete'])) {
-                $result = PM_Projects::delete(intval($_GET['delete']));
+            // Delete project (POST only for CSRF protection)
+            if (isset($_POST['pm_delete_project'])) {
+                $project_id = intval($_POST['pm_delete_project']);
+                check_admin_referer('pm_delete_project_' . $project_id);
+                $result = PM_Projects::delete($project_id);
                 if (is_wp_error($result)) {
                     wp_redirect(admin_url('admin.php?page=pm-projects&error=' . $result->get_error_code()));
                 } else {
@@ -144,9 +146,12 @@ class PM_Admin {
                 }
             }
             
-            if (isset($_GET['delete']) && check_admin_referer('pm_delete_class_' . $_GET['delete'])) {
+            // Delete class (POST only for CSRF protection)
+            if (isset($_POST['pm_delete_class'])) {
                 global $wpdb;
-                $wpdb->delete($wpdb->prefix . 'pm_classes', ['id' => intval($_GET['delete'])]);
+                $class_id = intval($_POST['pm_delete_class']);
+                check_admin_referer('pm_delete_class_' . $class_id);
+                $wpdb->delete($wpdb->prefix . 'pm_classes', ['id' => $class_id]);
                 wp_redirect(admin_url('admin.php?page=parent-meetings&class_deleted=1'));
                 exit;
             }
@@ -281,9 +286,12 @@ class PM_Admin {
                 exit;
             }
 
-            if (isset($_GET['delete']) && check_admin_referer('pm_delete_teacher_' . $_GET['delete'])) {
+            // Delete teacher (POST only for CSRF protection)
+            if (isset($_POST['pm_delete_teacher'])) {
                 global $wpdb;
-                $wpdb->delete($wpdb->prefix . 'pm_teachers', ['id' => intval($_GET['delete'])]);
+                $teacher_id = intval($_POST['pm_delete_teacher']);
+                check_admin_referer('pm_delete_teacher_' . $teacher_id);
+                $wpdb->delete($wpdb->prefix . 'pm_teachers', ['id' => $teacher_id]);
                 wp_redirect(admin_url('admin.php?page=pm-teachers&deleted=1'));
                 exit;
             }
@@ -298,10 +306,11 @@ class PM_Admin {
 
         // Bookings page actions
         if ($page === 'pm-bookings') {
-            // Delete booking
-            if (isset($_GET['delete_booking']) && check_admin_referer('pm_delete_booking_' . $_GET['delete_booking'])) {
+            // Delete booking (POST only for CSRF protection)
+            if (isset($_POST['pm_delete_booking'])) {
                 global $wpdb;
-                $booking_id = intval($_GET['delete_booking']);
+                $booking_id = intval($_POST['pm_delete_booking']);
+                check_admin_referer('pm_delete_booking_' . $booking_id);
 
                 // Get booking and slot info
                 $booking = $wpdb->get_row($wpdb->prepare(
@@ -328,10 +337,11 @@ class PM_Admin {
                 }
             }
 
-            // Cancel booking (mark as cancelled, keep record)
-            if (isset($_GET['cancel_booking']) && check_admin_referer('pm_cancel_booking_' . $_GET['cancel_booking'])) {
+            // Cancel booking (POST only for CSRF protection)
+            if (isset($_POST['pm_cancel_booking'])) {
                 global $wpdb;
-                $booking_id = intval($_GET['cancel_booking']);
+                $booking_id = intval($_POST['pm_cancel_booking']);
+                check_admin_referer('pm_cancel_booking_' . $booking_id);
 
                 $booking = $wpdb->get_row($wpdb->prepare(
                     "SELECT * FROM {$wpdb->prefix}pm_bookings WHERE id = %d",
